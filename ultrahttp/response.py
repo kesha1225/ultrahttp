@@ -9,17 +9,19 @@ from ._types import JSONDecoder
 class Response:
     def __init__(
         self,
-        body: bytes,
+        body: typing.Optional[bytes],
         http_version: bytes,
         status_code: int,
         reason: bytes,
         headers: typing.List[typing.Tuple[bytes, bytes]],
+        stream: AsyncByteStream
     ):
-        self.body = body
+        self.body: typing.Optional[bytes] = body
         self._http_version = http_version
         self.status_code = status_code
         self._reason = reason
         self._headers = headers
+        self._stream = stream
 
     @property
     def http_version(self):
@@ -46,8 +48,13 @@ class Response:
         )
         return self._headers
 
+    async def content(self):
+        if self.body is None:
+            self.body = b"".join(await _read_response_body(self._stream))
+        return self.body
+
     async def text(self, encoding: str = "utf-8"):
-        return self.body.decode(encoding)
+        return (await self.content()).decode(encoding)
 
     async def json(self, json_decoder: JSONDecoder = json.loads):
         return json_decoder(await self.text())

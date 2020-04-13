@@ -39,11 +39,12 @@ class HttpCore:
             http_version, status_code, reason, response_headers, stream = raw_response
 
             return Response(
-                b"".join(await _read_response_body(stream)),
-                http_version,
-                status_code,
-                reason,
-                response_headers,
+                body=None,
+                http_version=http_version,
+                status_code=status_code,
+                reason=reason,
+                headers=response_headers,
+                stream=stream,
             )
 
     async def get(

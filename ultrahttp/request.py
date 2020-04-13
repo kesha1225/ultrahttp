@@ -39,8 +39,7 @@ def _prepare_request(
     _headers = [(b"host", parsed_url.netloc.encode())]
 
     if headers is not None:
-        for header in headers.items():  # type: typing.Tuple[str, str]
-            key, value = header
+        for key, value in headers.items():
             _headers.append((key.encode(), value.encode()))
 
     path = parsed_url.path.encode() or b"/"
