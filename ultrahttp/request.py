@@ -1,7 +1,6 @@
 import typing
 import urllib.parse
 
-from ultrahttp._types import Params
 from ultrahttp.stream import DictDataStream
 
 
@@ -25,7 +24,7 @@ class Request:
 
 def _prepare_request(
     parsed_url: urllib.parse.ParseResult,
-    params: Params,
+    params: typing.Dict[str, typing.Any],
     data: typing.Optional[typing.Dict[str, typing.Any]],
     headers: typing.Optional[typing.Dict[str, str]],
 ) -> Request:
@@ -44,8 +43,7 @@ def _prepare_request(
 
     path = parsed_url.path.encode() or b"/"
     if params is not None:
-        path += b"?"
-        path += ("&".join(f"{k}={v}" for k, v in params.items())).encode()
+        path += b"?" + urllib.parse.urlencode(params, doseq=True).encode()
 
     data_iterator = None
     if data is not None:
@@ -54,10 +52,10 @@ def _prepare_request(
         data_iterator = DictDataStream(data).__aiter__()
 
     return Request(
-        port,
-        data_iterator,
-        path,
-        _headers,
-        parsed_url.scheme.encode(),
-        parsed_url.netloc.encode(),
+        port=port,
+        data_iterator=data_iterator,
+        path=path,
+        headers=_headers,
+        scheme=parsed_url.scheme.encode(),
+        netloc=parsed_url.netloc.encode(),
     )

@@ -5,8 +5,7 @@ import httpcore
 import typing_extensions
 from httpcore import AsyncByteStream
 
-from ._types import Params
-from .response import Response, _read_response_body
+from .response import Response
 from .request import Request, _prepare_request
 
 
@@ -17,8 +16,8 @@ class HttpCore:
     async def _request(
         self,
         url: str,
-        method: typing_extensions.Literal[b"GET", b"POST", b"PUT", b"DELETE"],
-        params: typing.Optional[Params] = None,
+        method: bytes,
+        params: typing.Optional[typing.Dict[str, typing.Any]] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
         data: typing.Optional[typing.Dict[str, typing.Any]] = None,
     ) -> Response:
@@ -47,21 +46,36 @@ class HttpCore:
                 stream=stream,
             )
 
+    async def request(
+        self,
+        url: str,
+        method: str,
+        params: typing.Optional[typing.Dict[str, typing.Any]] = None,
+        headers: typing.Optional[typing.Dict[str, str]] = None,
+        data: typing.Optional[typing.Dict[str, typing.Any]] = None,
+    ) -> Response:
+        if method.upper().encode() not in [b"GET", b"POST", b"PUT", b"DELETE"]:
+            raise RuntimeError("invalid method")
+
+        return await self._request(
+            url, method.upper().encode(), params=params, headers=headers, data=data
+        )
+
     async def get(
         self,
         url: str,
-        params: typing.Optional[Params] = None,
+        params: typing.Optional[typing.Dict[str, typing.Any]] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
     ) -> Response:
-        return await self._request(url, b"GET", params=params, headers=headers)
+        return await self.request(url, "GET", params=params, headers=headers)
 
     async def post(
         self,
         url: str,
-        params: typing.Optional[Params] = None,
+        params: typing.Optional[typing.Dict[str, typing.Any]] = None,
         data: typing.Optional[typing.Dict[str, typing.Any]] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
     ) -> Response:
-        return await self._request(
-            url, b"POST", params=params, data=data, headers=headers
+        return await self.request(
+            url, "POST", params=params, data=data, headers=headers
         )

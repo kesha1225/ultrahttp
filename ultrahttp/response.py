@@ -50,7 +50,7 @@ class Response:
 
     async def content(self) -> bytes:
         if self.body is None:
-            self.body = b"".join(await _read_response_body(self._stream))
+            self.body = await _read_response_body(self._stream)
         return self.body
 
     async def text(self, encoding: str = "utf-8") -> str:
@@ -70,4 +70,4 @@ async def _read_response_body(stream: AsyncByteStream) -> bytes:
             body.append(chunk)
     finally:
         await stream.aclose()
-    return body
+    return b"".join(body)

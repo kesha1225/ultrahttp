@@ -11,8 +11,5 @@ class DictDataStream:
         content_type = b"application/x-www-form-urlencoded"
         return [(b"Content-Length", content_length.encode()), (b"Content-Type", content_type)]
 
-    def __iter__(self) -> typing.Iterator[bytes]:
-        yield self.body
-
     async def __aiter__(self) -> typing.AsyncIterator[bytes]:
         yield self.body
