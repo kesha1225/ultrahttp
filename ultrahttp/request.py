@@ -28,7 +28,7 @@ def _prepare_request(
     params: Params,
     data: typing.Optional[typing.Dict[str, typing.Any]],
     headers: typing.Optional[typing.Dict[str, str]],
-):
+) -> Request:
     if not parsed_url.scheme:
         raise RuntimeError("invalid scheme")
 

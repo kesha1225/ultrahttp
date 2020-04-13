@@ -21,7 +21,7 @@ class HttpCore:
         params: typing.Optional[Params] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
         data: typing.Optional[typing.Dict[str, typing.Any]] = None,
-    ):
+    ) -> Response:
         parsed_url = urllib.parse.urlparse(url)
         request: Request = _prepare_request(
             parsed_url=parsed_url, params=params, data=data, headers=headers
@@ -52,7 +52,7 @@ class HttpCore:
         url: str,
         params: typing.Optional[Params] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
-    ):
+    ) -> Response:
         return await self._request(url, b"GET", params=params, headers=headers)
 
     async def post(
@@ -61,7 +61,7 @@ class HttpCore:
         params: typing.Optional[Params] = None,
         data: typing.Optional[typing.Dict[str, typing.Any]] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
-    ):
+    ) -> Response:
         return await self._request(
             url, b"POST", params=params, data=data, headers=headers
         )

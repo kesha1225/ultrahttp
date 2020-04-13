@@ -24,7 +24,7 @@ class Response:
         self._stream = stream
 
     @property
-    def http_version(self):
+    def http_version(self) -> str:
         self._http_version = (
             self._http_version.decode()
             if isinstance(self._http_version, bytes)
@@ -33,14 +33,14 @@ class Response:
         return self._http_version
 
     @property
-    def reason(self):
+    def reason(self) -> str:
         self._reason = (
             self._reason.decode() if isinstance(self._reason, bytes) else self._reason
         )
         return self._reason
 
     @property
-    def headers(self):
+    def headers(self) -> typing.Dict[str, str]:
         self._headers = (
             {k.decode(): v.decode() for k, v in dict(self._headers).items()}
             if isinstance(self._headers, list)
@@ -48,22 +48,22 @@ class Response:
         )
         return self._headers
 
-    async def content(self):
+    async def content(self) -> bytes:
         if self.body is None:
             self.body = b"".join(await _read_response_body(self._stream))
         return self.body
 
-    async def text(self, encoding: str = "utf-8"):
+    async def text(self, encoding: str = "utf-8") -> str:
         return (await self.content()).decode(encoding)
 
-    async def json(self, json_decoder: JSONDecoder = json.loads):
+    async def json(self, json_decoder: JSONDecoder = json.loads) -> typing.Dict[str, str]:
         return json_decoder(await self.text())
 
     def __str__(self):
         return f"<Response [{self.status_code}]>"
 
 
-async def _read_response_body(stream: AsyncByteStream):
+async def _read_response_body(stream: AsyncByteStream) -> bytes:
     try:
         body = []
         async for chunk in stream:
