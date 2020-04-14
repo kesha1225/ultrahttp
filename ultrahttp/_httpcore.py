@@ -1,12 +1,12 @@
-import urllib.parse
 import typing
+import urllib.parse
 
 import httpcore
-import typing_extensions
 from httpcore import AsyncByteStream
 
-from .response import Response
 from .request import Request, _prepare_request
+from .response import Response
+from .request_pool import RequestPool
 
 
 class HttpCore:
@@ -27,7 +27,6 @@ class HttpCore:
         )
 
         async with self.connection_pool as http:
-
             raw_response = await http.request(
                 method,
                 (request.scheme, request.netloc, request.port, request.path,),
@@ -67,6 +66,7 @@ class HttpCore:
         params: typing.Optional[typing.Dict[str, typing.Any]] = None,
         headers: typing.Optional[typing.Dict[str, str]] = None,
     ) -> Response:
+
         return await self.request(url, "GET", params=params, headers=headers)
 
     async def post(
